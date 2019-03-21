@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
+import java.util.Random;
 
 
 public class SimpleProducer {
@@ -55,13 +56,21 @@ public class SimpleProducer {
         Producer<String, String> producer = new KafkaProducer
                 <String, String>(props);
 
-        for(int i = 0; i < 10; i++){
+        for(int i = 0; i < 100; i++){
+            Random rand = new Random();
+            String key = "id_" + rand.nextInt(4);
+            String value = Integer.toString(i);
             ProducerRecord<String, String> record = new ProducerRecord<String, String>(
                     topicName,
-                    Integer.toString(i), Integer.toString(i)
+                    key,
+                    value
             );
 
-            // send function is async function
+            // todo: Same key => will send in same partition
+
+            logger.info("Key: " + key);
+
+            // todo: send function is async function
             producer.send(record, new Callback() {
                 @Override
                 public void onCompletion(RecordMetadata metadata, Exception exception) {
@@ -77,7 +86,7 @@ public class SimpleProducer {
                         logger.error("Record sent failure: " + exception);
                     }
                 }
-            });
+            }).get(); // todo: block the .send() to make it synchronous - don't do this in production!
         }
 
         logger.info("Message sent completed");
