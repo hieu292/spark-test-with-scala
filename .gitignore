@@ -147,5 +147,4 @@ local.properties
 .scala_dependencies
 .worksheet
 
-/.idea/modules/spark-test-with-scala-build.iml
-/.idea/modules/spark-test-with-scala.iml
+.idea/
