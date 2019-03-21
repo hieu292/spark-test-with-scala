@@ -1,23 +1,18 @@
 package ibl;
 
-//import util.properties packages
-
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
-//import simple producer packages
-//import KafkaProducer packages
-//import ProducerRecord packages
 
-//Create java class named “SimpleProducer”
 public class SimpleProducer {
 
     public static void main(String[] args) throws Exception{
+
+        final Logger logger = LoggerFactory.getLogger(SimpleProducer.class);
 
         // Check arguments length value
         if(args.length == 0){
@@ -60,10 +55,32 @@ public class SimpleProducer {
         Producer<String, String> producer = new KafkaProducer
                 <String, String>(props);
 
-        for(int i = 0; i < 10; i++)
-            producer.send(new ProducerRecord<String, String>(topicName,
-                    Integer.toString(i), Integer.toString(i)));
-        System.out.println("Message sent successfully");
+        for(int i = 0; i < 10; i++){
+            ProducerRecord<String, String> record = new ProducerRecord<String, String>(
+                    topicName,
+                    Integer.toString(i), Integer.toString(i)
+            );
+
+            // send function is async function
+            producer.send(record, new Callback() {
+                @Override
+                public void onCompletion(RecordMetadata metadata, Exception exception) {
+                    if(exception == null){
+                        // Record was sent successfully
+                        logger.info("Received metadata. \n" +
+                                "Topic: " + metadata.topic() + "\n" +
+                                "Partition: " + metadata.partition() + "\n" +
+                                "Offset: " + metadata.offset() + "\n" +
+                                "Timestamp: " + metadata.timestamp() + "\n"
+                        );
+                    } else {
+                        logger.error("Record sent failure: " + exception);
+                    }
+                }
+            });
+        }
+
+        logger.info("Message sent completed");
         producer.close();
     }
 }
