@@ -17,3 +17,6 @@ libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" 
 // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
 libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.7.26"
 
+libraryDependencies ~= { _.map(_.exclude("org.slf4j", "slf4j-log4j12")) }
+
+

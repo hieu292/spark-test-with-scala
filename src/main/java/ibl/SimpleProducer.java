@@ -13,7 +13,7 @@ public class SimpleProducer {
 
     public static void main(String[] args) throws Exception{
 
-        final Logger logger = LoggerFactory.getLogger(SimpleProducer.class);
+        Logger logger = LoggerFactory.getLogger(SimpleProducer.class.getName());
 
         // Check arguments length value
         if(args.length == 0){
